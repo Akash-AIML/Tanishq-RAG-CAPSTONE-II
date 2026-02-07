@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import '@fontsource/playfair-display';
+import '@fontsource/playfair-display/700.css';
 import '@fontsource/lato';
 import SearchBar from './components/SearchBar';
 import FilterBar from './components/FilterBar';
@@ -10,6 +11,8 @@ import { searchByText, searchSimilar, searchByUploadedImage } from './services/a
 import './App.css';
 import bgImage from './assets/bg-luxury.jpg';
 
+const ITEMS_PER_PAGE = 12;
+
 function App() {
     const [results, setResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -18,15 +21,18 @@ function App() {
     const [currentQuery, setCurrentQuery] = useState('');
     const [hasSearched, setHasSearched] = useState(false);
     const [activeFilters, setActiveFilters] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [history, setHistory] = useState([]);
 
     // Trigger search when query OR filters change
     const performSearch = async (queryText, filters) => {
         setIsLoading(true);
         setError(null);
         setHasSearched(true);
+        setCurrentPage(1);
         
         try {
-            const data = await searchByText(queryText, filters, 12);
+            const data = await searchByText(queryText, filters, 30);
             setResults(data.results || []);
         } catch (err) {
             setError(err.message);
@@ -37,6 +43,7 @@ function App() {
     };
 
     const handleTextSearch = (query) => {
+        setHistory([]); // Clear history on new text search
         setCurrentQuery(query);
         performSearch(query, activeFilters);
     };
@@ -46,6 +53,7 @@ function App() {
         setResults([]);
         setCurrentQuery('');
         setActiveFilters([]);
+        setHistory([]);
     };
 
     const handleFilterToggle = (filter) => {
@@ -64,13 +72,23 @@ function App() {
     };
 
     const handleSimilarSearch = async (imageId) => {
+        // Save current state to history
+        setHistory(prev => [...prev, {
+            results,
+            currentQuery,
+            activeFilters,
+            currentPage,
+            hasSearched
+        }]);
+
         setIsLoading(true);
         setError(null);
         setHasSearched(true);
+        setCurrentPage(1);
         setCurrentQuery(`Similar to: ${imageId}`);
 
         try {
-            const data = await searchSimilar(imageId, 12);
+            const data = await searchSimilar(imageId, 30);
             setResults(data.results || []);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
@@ -81,14 +99,31 @@ function App() {
         }
     };
 
+    const handleBack = () => {
+        if (history.length === 0) return;
+        
+        const lastState = history[history.length - 1];
+        setResults(lastState.results);
+        setCurrentQuery(lastState.currentQuery);
+        setActiveFilters(lastState.activeFilters);
+        setCurrentPage(lastState.currentPage);
+        setHasSearched(lastState.hasSearched);
+        
+        // Remove the state we just restored
+        setHistory(prev => prev.slice(0, -1));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const handleImageUploadSearch = async (imageFile) => {
+        setHistory([]); // New upload clears history
         setIsLoading(true);
         setError(null);
         setHasSearched(true);
+        setCurrentPage(1);
         setCurrentQuery(`Visual search: ${imageFile.name}`);
 
         try {
-            const data = await searchByUploadedImage(imageFile, 12);
+            const data = await searchByUploadedImage(imageFile, 30);
             setResults(data.results || []);
         } catch (err) {
             setError(err.message);
@@ -104,8 +139,16 @@ function App() {
         }}>
             <header className="app-header">
                 <div className="header-content container">
-                    <div className="logo-section" onClick={handleReset} style={{cursor: 'pointer'}}>
-                        <h1 className="brand-logo">Tanishq</h1>
+                    <div className="left-header-section" style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
+                        {history.length > 0 && (
+                            <button onClick={handleBack} className="back-btn header-back-btn" title="Go back to previous results">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                <span>Back</span>
+                            </button>
+                        )}
+                        <div className="logo-section" onClick={handleReset} style={{cursor: 'pointer'}}>
+                            <h1 className="brand-logo">Tanishq</h1>
+                        </div>
                     </div>
                     <div className="header-actions">
                         <button className="icon-btn search-trigger" onClick={handleReset}>
@@ -166,10 +209,39 @@ function App() {
                         ) : error ? (
                             <div className="error-message">{error}</div>
                         ) : (
-                            <ResultsGrid 
-                                results={results} 
-                                onImageClick={setSelectedItem}
-                            />
+                            <>
+                                <ResultsGrid 
+                                    results={results.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)} 
+                                    onImageClick={setSelectedItem}
+                                />
+                                {results.length > ITEMS_PER_PAGE && (
+                                    <div className="pagination-container">
+                                        <button 
+                                            disabled={currentPage === 1}
+                                            onClick={() => {
+                                                setCurrentPage(p => p - 1);
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            }}
+                                            className="pagination-btn"
+                                        >
+                                            Previous
+                                        </button>
+                                        <span className="page-info">
+                                            Page {currentPage} of {Math.ceil(results.length / ITEMS_PER_PAGE)}
+                                        </span>
+                                        <button 
+                                            disabled={currentPage >= Math.ceil(results.length / ITEMS_PER_PAGE)}
+                                            onClick={() => {
+                                                setCurrentPage(p => p + 1);
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            }}
+                                            className="pagination-btn"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                )}
+                            </>
                         )}
                     </div>
                 )}

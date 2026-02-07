@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './FilterBar.css';
 
-const PRIMARY_FILTERS = ['All', 'Rings', 'Necklaces', 'Earrings', 'Bracelets', 'Diamond', 'Gold'];
+const PRIMARY_FILTERS = ['All', 'Rings', 'Necklaces', 'Diamond', 'Gold'];
 const EXTRA_FILTERS = ['Platinum', 'Emerald', 'Ruby', 'Sapphire', 'Pearl', 'Rose Gold'];
 
 const FilterBar = ({ activeFilters = [], onToggle }) => {
