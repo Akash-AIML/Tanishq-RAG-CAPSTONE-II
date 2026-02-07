@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv
+env/
+venv/
+ENV/
+
+# Environment Variables
+.env
+backend/.env
+frontend/.env
+
+# Local Databases (Optional - remove if you want to track the DB)
+*.sqlite3
+*.db
+chroma_primary/
+frontend/chroma_primary/
+
+# OS specific
+.DS_Store
+Thumbs.db

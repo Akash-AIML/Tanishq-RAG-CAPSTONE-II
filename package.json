@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@fontsource/lato": "^5.2.7",
+    "@fontsource/playfair-display": "^5.2.8",
+    "react-dropzone": "^14.4.0"
+  }
+}
