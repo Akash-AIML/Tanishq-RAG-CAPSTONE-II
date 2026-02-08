@@ -11,7 +11,9 @@
     "dependencies": {
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "axios": "^1.6.0"
+        "axios": "^1.6.0",
+        "@fontsource/playfair-display": "^5.0.0",
+        "@fontsource/lato": "^5.0.0"
     },
     "devDependencies": {
         "@types/react": "^18.2.43",
