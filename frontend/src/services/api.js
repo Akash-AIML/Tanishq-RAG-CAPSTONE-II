@@ -10,8 +10,8 @@ import axios from "axios";
  */
 
 const BASE_URL =
-  import.meta.env.VITE_BACKEND_URL ||
-  "http://localhost:8000";
+    import.meta.env.VITE_BACKEND_URL ||
+    "http://localhost:8000";
 
 /**
  * ============================================================
@@ -20,11 +20,11 @@ const BASE_URL =
  */
 
 const api = axios.create({
-  baseURL: BASE_URL,
-  timeout: 60000, // 60s for LLM / reranking latency
-  headers: {
-    "Content-Type": "application/json",
-  },
+    baseURL: BASE_URL,
+    timeout: 60000, // 60s for LLM / reranking latency
+    headers: {
+        "Content-Type": "application/json",
+    },
 });
 
 /**
@@ -34,79 +34,79 @@ const api = axios.create({
  */
 
 export const searchByText = async (
-  query,
-  filters = [],
-  topK = 5
+    query,
+    filters = [],
+    topK = 5
 ) => {
-  try {
-    // Convert UI filter array → backend dict
-    const filterDict = {};
+    try {
+        // Convert UI filter array → backend dict
+        const filterDict = {};
 
-    filters.forEach((f) => {
-      let lowerF = f.toLowerCase();
+        filters.forEach((f) => {
+            let lowerF = f.toLowerCase();
 
-      // Handle plurals
-      if (
-        [
-          "rings",
-          "necklaces",
-          "earrings",
-          "bracelets",
-          "diamonds",
-          "emeralds",
-          "rubies",
-          "sapphires",
-          "pearls",
-        ].includes(lowerF)
-      ) {
-        if (lowerF.endsWith("ies")) {
-          lowerF = lowerF.replace("ies", "y");
-        } else {
-          lowerF = lowerF.slice(0, -1);
-        }
-      }
+            // Handle plurals
+            if (
+                [
+                    "rings",
+                    "necklaces",
+                    "earrings",
+                    "bracelets",
+                    "diamonds",
+                    "emeralds",
+                    "rubies",
+                    "sapphires",
+                    "pearls",
+                ].includes(lowerF)
+            ) {
+                if (lowerF.endsWith("ies")) {
+                    lowerF = lowerF.replace("ies", "y");
+                } else {
+                    lowerF = lowerF.slice(0, -1);
+                }
+            }
 
-      // Map to attributes
-      if (
-        [
-          "gold",
-          "silver",
-          "platinum",
-          "rose gold",
-          "white gold",
-        ].includes(lowerF)
-      ) {
-        filterDict["metal"] = lowerF;
-      } else if (
-        [
-          "necklace",
-          "ring",
-          "earring",
-          "bracelet",
-          "bangle",
-          "pendant",
-        ].includes(lowerF)
-      ) {
-        filterDict["category"] = lowerF;
-      } else {
-        filterDict["primary_stone"] = lowerF;
-      }
-    });
+            // Map to attributes
+            if (
+                [
+                    "gold",
+                    "silver",
+                    "platinum",
+                    "rose gold",
+                    "white gold",
+                ].includes(lowerF)
+            ) {
+                filterDict["metal"] = lowerF;
+            } else if (
+                [
+                    "necklace",
+                    "ring",
+                    "earring",
+                    "bracelet",
+                    "bangle",
+                    "pendant",
+                ].includes(lowerF)
+            ) {
+                filterDict["category"] = lowerF;
+            } else {
+                filterDict["primary_stone"] = lowerF;
+            }
+        });
 
-    const response = await api.post("/search/text", {
-      query,
-      filters: filterDict,
-      top_k: topK,
-    });
+        const response = await api.post("/search/text", {
+            query,
+            filters: filterDict,
+            top_k: topK,
+        });
 
-    return response.data;
-  } catch (error) {
-    console.error("Text search error:", error);
-    throw new Error(
-      error.response?.data?.detail ||
-        "Failed to search. Please try again."
-    );
-  }
+        return response.data;
+    } catch (error) {
+        console.error("Text search error:", error);
+        throw new Error(
+            error.response?.data?.detail ||
+            "Failed to search. Please try again."
+        );
+    }
 };
 
 /**
@@ -116,26 +116,26 @@ export const searchByText = async (
  */
 
 export const searchSimilar = async (
-  imageId,
-  topK = 5
+    imageId,
+    topK = 5
 ) => {
-  try {
-    const response = await api.post(
-      "/search/similar",
-      {
-        image_id: imageId,
-        top_k: topK,
-      }
-    );
+    try {
+        const response = await api.post(
+            "/search/similar",
+            {
+                image_id: imageId,
+                top_k: topK,
+            }
+        );
 
-    return response.data;
-  } catch (error) {
-    console.error("Similar search error:", error);
-    throw new Error(
-      error.response?.data?.detail ||
-        "Failed to find similar items."
-    );
-  }
+        return response.data;
+    } catch (error) {
+        console.error("Similar search error:", error);
+        throw new Error(
+            error.response?.data?.detail ||
+            "Failed to find similar items."
+        );
+    }
 };
 
 /**
@@ -145,35 +145,35 @@ export const searchSimilar = async (
  */
 
 export const searchByUploadedImage = async (
-  imageFile,
-  topK = 12
+    imageFile,
+    topK = 12
 ) => {
-  try {
-    const formData = new FormData();
-    formData.append("file", imageFile);
-    formData.append("top_k", topK);
+    try {
+        const formData = new FormData();
+        formData.append("file", imageFile);
+        formData.append("top_k", topK);
 
-    const response = await api.post(
-      "/search/upload-image",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+        const response = await api.post(
+            "/search/upload-image",
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
 
-    return response.data;
-  } catch (error) {
-    console.error(
-      "Image upload search error:",
-      error
-    );
-    throw new Error(
-      error.response?.data?.detail ||
-        "Failed to search by image."
-    );
-  }
+        return response.data;
+    } catch (error) {
+        console.error(
+            "Image upload search error:",
+            error
+        );
+        throw new Error(
+            error.response?.data?.detail ||
+            "Failed to search by image."
+        );
+    }
 };
 
 /**
@@ -183,32 +183,32 @@ export const searchByUploadedImage = async (
  */
 
 export const searchByHandwrittenQuery =
-  async (imageFile, topK = 12) => {
-    try {
-      const formData = new FormData();
-      formData.append("file", imageFile);
-      formData.append("top_k", topK);
+    async (imageFile, topK = 12) => {
+        try {
+            const formData = new FormData();
+            formData.append("file", imageFile);
+            formData.append("top_k", topK);
 
-      const response = await api.post(
-        "/search/ocr-query",
-        formData,
-        {
-          headers: {
-            "Content-Type":
-              "multipart/form-data",
-          },
+            const response = await api.post(
+                "/search/ocr-query",
+                formData,
+                {
+                    headers: {
+                        "Content-Type":
+                            "multipart/form-data",
+                    },
+                }
+            );
+
+            return response.data;
+        } catch (error) {
+            console.error("OCR search error:", error);
+            throw new Error(
+                error.response?.data?.detail ||
+                "Failed to extract text from image."
+            );
         }
-      );
-
-      return response.data;
-    } catch (error) {
-      console.error("OCR search error:", error);
-      throw new Error(
-        error.response?.data?.detail ||
-          "Failed to extract text from image."
-      );
-    }
-  };
+    };
 
 /**
  * ============================================================
@@ -217,11 +217,9 @@ export const searchByHandwrittenQuery =
  */
 
 export const getImageUrl = (imageId) => {
-  const base =
-    import.meta.env.VITE_BACKEND_URL ||
-    "http://localhost:8000";
-
-  return `${base}/image/${imageId}`;
+    const IMAGE_BASE = "https://akash-dragon-capstone-ii.hf.space/image";
+    const imageUrl = `${IMAGE_BASE}/${imageId}`;
+    return imageUrl;
 };
 
 export default api;

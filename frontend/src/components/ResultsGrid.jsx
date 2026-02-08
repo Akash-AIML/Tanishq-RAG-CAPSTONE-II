@@ -16,34 +16,35 @@ const ResultsGrid = ({ results, onImageClick }) => {
         <div className="results-grid">
             {results.map((item, index) => {
                 const imageId = item.image_id || item.id;
-                
+
                 // --- IMPROVED SCORE DISPLAY LOGIC ---
                 // For distance metrics (smaller is better):
                 // 0.0 is exact match, ~1.5 is far.
                 // Linear map: 0->99%, 0.8->85%, 1.2->70%, 1.5+ -> 60%
-                
+
                 // Get the raw metric
                 const rawVal = item.scores?.visual ?? item.scores?.final ?? 1.2;
-                
+
                 // Safe calculation for percentage
                 // 1. Invert distance: score = 1 / (1 + distance)  => 1/1=100%, 1/2=50%
                 // But typically L2 distance needs a sharper curve for UI.
                 // Let's rely on a customized curve.
-                
+
                 let percentMatch;
                 if (rawVal < 0.1) percentMatch = 99; // Practically identical
                 else if (rawVal < 0.5) percentMatch = Math.round(98 - (rawVal * 20)); // 0.1->96, 0.4->90
                 else if (rawVal < 1.0) percentMatch = Math.round(90 - ((rawVal - 0.5) * 30)); // 0.5->90, 1.0->75
                 else percentMatch = Math.max(60, Math.round(75 - ((rawVal - 1.0) * 15))); // 1.2->72
-                
+
                 const displayScore = percentMatch;
 
-                const imageUrl = `/api/image/${imageId}`;
+                const IMAGE_BASE = "https://akash-dragon-capstone-ii.hf.space/image";
+                const imageUrl = `${IMAGE_BASE}/${imageId}`;
 
                 return (
-                    <div 
-                        key={imageId} 
-                        className="result-card fade-in-up" 
+                    <div
+                        key={imageId}
+                        className="result-card fade-in-up"
                         onClick={() => onImageClick(item)}
                         style={{ animationDelay: `${index * 50}ms` }}
                     >
@@ -51,13 +52,13 @@ const ResultsGrid = ({ results, onImageClick }) => {
                             <span className="match-badge">
                                 <span className="match-icon">✨</span> {displayScore}% Match
                             </span>
-                            <img 
-                                src={imageUrl} 
-                                alt={item.metadata?.product_name || 'Jewellery Item'} 
+                            <img
+                                src={imageUrl}
+                                alt={item.metadata?.product_name || 'Jewellery Item'}
                                 className="card-image"
                                 loading="lazy"
                                 onError={(e) => {
-                                    e.target.onerror = null; 
+                                    e.target.onerror = null;
                                     e.target.src = 'https://via.placeholder.com/300x300?text=Image+Not+Found';
                                 }}
                             />
@@ -75,16 +76,16 @@ const ResultsGrid = ({ results, onImageClick }) => {
                             <div className="card-header">
                                 <h3 className="card-title">
                                     {[
-                                        item.metadata?.metal, 
-                                        item.metadata?.primary_stone !== 'unknown' ? item.metadata?.primary_stone : null, 
+                                        item.metadata?.metal,
+                                        item.metadata?.primary_stone !== 'unknown' ? item.metadata?.primary_stone : null,
                                         item.metadata?.category
                                     ].filter(Boolean).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ') || `Item ${imageId}`}
                                 </h3>
                             </div>
-                            
+
                             <div className="card-tags">
                                 {[
-                                    item.metadata?.metal, 
+                                    item.metadata?.metal,
                                     item.metadata?.category,
                                     item.metadata?.form !== 'unknown' ? item.metadata?.form : null
                                 ].filter(Boolean).map((tag, i) => (
