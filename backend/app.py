@@ -50,7 +50,8 @@ else:
 CHROMA_PATH = os.path.join(BASE_DIR, "chroma_primary")
 DATA_DIR = os.path.join(BASE_DIR, "data", "tanishq")
 IMAGE_DIR = os.path.join(DATA_DIR, "images")
-EXTRACTED_METADATA_PATH = os.path.join(DATA_DIR, "generated_metadata.json")
+EXTRACTED_METADATA_PATH = os.path.join(DATA_DIR, "enhanced_metadata.json")
+FLORENCE_CAPTIONS_PATH = os.path.join(DATA_DIR, "florence_captions_all.json")
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -84,9 +85,18 @@ def get_cross_encoder():
     return cross_encoder
 
 # %%
-print("🔹 Loading extracted metadata...")
+print("🔹 Loading enhanced metadata...")
 with open(EXTRACTED_METADATA_PATH, "r") as f:
     ENHANCED_METADATA = json.load(f)
+
+print("🔹 Loading Florence captions...")
+with open(FLORENCE_CAPTIONS_PATH, "r") as f:
+    florence_data = json.load(f)
+    # Convert list format to dict for faster lookup
+    FLORENCE_CAPTIONS = {item["image"]: item["caption"] for item in florence_data}
+
+print(f"✅ Loaded metadata for {len(ENHANCED_METADATA)} images")
+print(f"✅ Loaded {len(FLORENCE_CAPTIONS)} Florence captions")
 
 # %%
 # ============================================================
@@ -789,12 +799,19 @@ def rerank_with_cross_encoder(
         )["metadatas"][0]
 
         enhanced_meta = ENHANCED_METADATA.get(c["image_id"], {})
-
-        # Build document text for cross-encoder
-        doc_text = enhanced_meta.get(
-            "metadata_text",
-            f"{meta.get('category','jewellery')} made of {meta.get('metal','metal')}"
-        )
+        
+        # Use Florence caption if available, otherwise fall back to metadata_text
+        florence_caption = FLORENCE_CAPTIONS.get(c["image_id"], "")
+        
+        if florence_caption:
+            # Use Florence caption for richer semantic matching
+            doc_text = florence_caption
+        else:
+            # Fallback to metadata_text
+            doc_text = enhanced_meta.get(
+                "metadata_text",
+                f"{meta.get('category','jewellery')} made of {meta.get('metal','metal')}"
+            )
 
         pairs.append([query, doc_text])
 

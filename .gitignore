@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+dist/
+build/
+.next/
+out/
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Backend temporary files
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env/
+
+# Data files (excluding large images, including JSONs)
+data/tanishq/images/
+data/tanishq/Jewellery_Data/
+data/tanishq/rejected_images.json
+data/tanishq/valid_images.json
