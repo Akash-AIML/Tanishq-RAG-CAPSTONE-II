@@ -7,6 +7,7 @@
 
 An elegant, AI-powered jewellery search application leveraging **Multimodal RAG** (Retrieval-Augmented Generation). Search through vast collections using text, images, or even handwritten queries with state-of-the-art CLIP embeddings.
 
+🔗 **Live Demo**: [tanishq-rag-capstone-ii.vercel.app](https://tanishq-rag-capstone-ii.vercel.app/)
 ---
 
 ## 🌟 Core Features
