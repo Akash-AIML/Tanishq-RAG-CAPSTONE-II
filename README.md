@@ -1,93 +1,77 @@
-# Jewellery Multimodal Search - Full Stack Application
+# 💍 Jewellery Multimodal Search - RAG Capstone II
 
-## 🎯 Overview
+[![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-18.0.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-4.0.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 
-A beautiful, AI-powered jewellery search application featuring:
-- **Frontend**: Modern React UI with glassmorphism design, smooth animations, and responsive layout
-- **Backend**: FastAPI server with CLIP embeddings and ChromaDB vector database
-- **Features**: Text-based search, visual similarity search, detailed item views
+An elegant, AI-powered jewellery search application leveraging **Multimodal RAG** (Retrieval-Augmented Generation). Search through vast collections using text, images, or even handwritten queries with state-of-the-art CLIP embeddings.
+
+---
+
+## 🌟 Core Features
+
+- 🔍 **Natural Language Search**: Find jewellery using descriptive queries like *"gold necklace with emeralds"*.
+- 📸 **Visual Similarity Search**: Upload an image or click "Find Similar" to discover related pieces.
+- ✍️ **Handwritten OCR Search**: Extract and search using queries from handwritten notes or sketches.
+- ✨ **Premium UI/UX**: Modern glassmorphism design with smooth animations and responsive layouts.
+- 🧠 **AI Explanations**: LLM-powered insights into why certain results were matched (via Groq).
 
 ---
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### 📋 Prerequisites
 
-- **Node.js** 18+ (for frontend)
-- **Python** 3.8+ (for backend)
-- **pip** (Python package manager)
+- **Node.js** 18+
+- **Python** 3.10+
+- **Conda** (recommended for ML dependencies)
+- **Groq API Key** (Get it at [console.groq.com](https://console.groq.com/))
 
-### Backend Setup
+### 🛠️ Backend Setup
 
-1. **Navigate to backend directory:**
+1. **Navigate to backend:**
    ```bash
-   cd /home/akash/Jewellary_RAG/backend
+   cd backend
    ```
 
-2. **Set up Groq API Key** (for LLM-powered explanations):
-   ```bash
-   export GROQ_API_KEY="your_groq_api_key_here"
-   ```
-   
-   Or create a `.env` file:
-   ```bash
-   echo "GROQ_API_KEY=your_groq_api_key_here" > .env
-   ```
-   
-   Get your free API key from: https://console.groq.com/keys
-
-3. **Activate the ml conda environment** (already has all dependencies):
-   ```bash
-   conda activate ml
+2. **Environment Configuration:**
+   Create a `.env` file:
+   ```env
+   GROQ_API_KEY=your_actual_key_here
    ```
 
-4. **Install OpenAI library** (for Groq client):
+3. **Install Dependencies:**
+   If using Conda:
    ```bash
-   pip install openai
+   conda create -n jewellery_rag python=3.10
+   conda activate jewellery_rag
+   pip install -r requirements.txt
    ```
 
-5. **Start the backend server:**
-   ```bash
-   python app.py
-   ```
-   
-   Or with uvicorn directly:
+4. **Start the Server:**
    ```bash
    uvicorn app:app --reload --host 0.0.0.0 --port 8000
    ```
+   ✅ API available at: `http://localhost:8000`
 
-   ✅ Backend will run on `http://localhost:8000`
+### 💻 Frontend Setup
 
-   > **Note**: The `ml` environment already contains all required packages (torch, CLIP, chromadb, fastapi, etc.) from your Jupyter notebook development.
-
-### Frontend Setup
-
-1. **Navigate to frontend directory:**
+1. **Navigate to frontend:**
    ```bash
-   cd /home/akash/Jewellary_RAG/frontend
+   cd frontend
    ```
 
-2. **Install dependencies** (already done if you followed setup):
+2. **Install & Start:**
    ```bash
    npm install
-   ```
-
-3. **Start the development server:**
-   ```bash
    npm run dev
    ```
-
-   ✅ Frontend will run on `http://localhost:5173`
-
-4. **Open in browser:**
-   ```
-   http://localhost:5173
-   ```
+   ✅ App available at: `http://localhost:5173`
 
 ---
 
-## 📁 Project Structure
-
+## 📂 Project Architecture
 ```
 Jewellary_RAG/
 ├── backend/
@@ -111,153 +95,40 @@ Jewellary_RAG/
 ├── data/                      # Jewellery images and metadata
 └── embeddings/                # Pre-computed embeddings
 ```
-
 ---
 
-## 🎨 Features
+## 📡 API Reference
 
-### Text Search
-- Search using natural language queries
-- Example: "gold necklace with pearls", "diamond ring", "silver earrings"
-- AI-powered semantic understanding
-
-### Visual Similarity Search
-- Click "Find Similar" on any item
-- Discovers visually similar jewellery pieces
-- Combines visual embeddings with metadata matching
-
-### Detailed Item View
-- Click any image to see full details
-- View all similarity scores (visual, metadata, final)
-- Quick access to find similar items
-
-### Premium Design
-- Dark theme with glassmorphism effects
-- Smooth animations and micro-interactions
-- Responsive layout (desktop, tablet, mobile)
-- Gradient accents and modern typography
-
----
-
-## 🔧 API Endpoints
-
-### Backend API (Port 8000)
-
-**POST** `/search/text`
-```json
-{
-  "query": "gold necklace",
-  "top_k": 5
-}
-```
-
-**POST** `/search/similar`
-```json
-{
-  "image_id": "image_001.jpg",
-  "top_k": 5
-}
-```
-
-**GET** `/image/{image_id}`
-- Returns the jewellery image file
-
----
-
-## 🎯 Usage Guide
-
-1. **Start Both Servers**
-   - Backend on port 8000
-   - Frontend on port 5173
-
-2. **Search for Jewellery**
-   - Enter a search query (e.g., "pearl necklace")
-   - Click "Search" or press Enter
-   - Results appear in a responsive grid
-
-3. **Explore Similar Items**
-   - Click "Find Similar" on any result card
-   - View visually similar jewellery pieces
-
-4. **View Details**
-   - Click on any image to open detailed view
-   - See full scores and descriptions
-   - Find similar items from the modal
-
----
-
-## 🛠️ Development
-
-### Frontend Development
-```bash
-cd frontend
-npm run dev      # Start dev server with hot reload
-npm run build    # Build for production
-npm run preview  # Preview production build
-```
-
-### Backend Development
-```bash
-cd backend
-python app.py    # Start with auto-reload
-```
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/search/text` | `POST` | Semantic text search using CLIP |
+| `/search/similar` | `POST` | Visual similarity search via Image ID |
+| `/search/upload-image`| `POST` | Image-to-image search via file upload |
+| `/search/ocr-query` | `POST` | Handwritten text extraction & search |
+| `/image/{id}` | `GET` | Serve jewellery assets |
 
 ---
 
 ## 🎨 Design System
 
-The frontend uses a comprehensive design system with:
-
-- **CSS Variables** for consistent theming
-- **Glassmorphism** effects with backdrop blur
-- **Gradient Accents** (purple, gold, teal)
-- **Smooth Animations** for all interactions
-- **Responsive Grid** system
-- **Custom Scrollbars** with gradient styling
+The application utilizes a **Soft Gradient Luxury** aesthetic:
+- **Tokens**: Consistent HSL color palette for gold and dark themes.
+- **Glassmorphism**: Backdrop filters for premium card feel.
+- **Animations**: Framer Motion / CSS transitions for micro-interactions.
+- **Responsiveness**: Mobile-first grid system.
 
 ---
 
-## 📝 Notes
 
-- **CORS**: Vite proxy handles CORS during development
-- **Node Version**: Uses Vite 4.x for Node 18 compatibility
-- **Image Paths**: Backend serves images from `/data/tanishq/images/`
-- **ChromaDB**: Pre-populated with jewellery embeddings
 
 ---
 
-## 🐛 Troubleshooting
+## 📝 Troubleshooting
 
-**Backend won't start:**
-- Ensure all Python dependencies are installed
-- Check ChromaDB path exists: `/home/akash/Jewellary_RAG/backend/chroma`
-- Verify CLIP model downloads successfully
-
-**Frontend can't connect to backend:**
-- Ensure backend is running on port 8000
-- Check Vite proxy configuration in `vite.config.js`
-- Verify no firewall blocking localhost connections
-
-**Images not loading:**
-- Check image directory path in `backend/app.py`
-- Verify images exist in `/data/tanishq/images/`
+- **CORS Errors**: Ensure the backend `allow_origins` includes your frontend URL.
+- **Missing Images**: Verify the `DATA_PATH` in `app.py` matches your local setup.
+- **Model Load Delay**: The first search may take longer as CLIP model weights are loaded into memory.
 
 ---
 
-## 🚀 Production Deployment
 
-### Backend
-```bash
-pip install gunicorn
-gunicorn app:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
-```
-
-### Frontend
-```bash
-npm run build
-# Serve the dist/ folder with nginx or any static server
-```
-
----
-
-**Built with ❤️ using React, Vite, FastAPI, CLIP, and ChromaDB**
